@@ -9,41 +9,44 @@ export const DRUGS_NAMES = {
     DAFALGAN: "Dafalgan",
 };
 
+
+/**
+ * Default behavior for drugs not explicitly defined in `DRUGS_BEHAVIOR`.
+ */
+
+export const DEFAULT_DRUGS_BEHAVIOR = {decreaseBenefit: 1, increaseBenefit: 0};
+
+
+/**
+ * Multiplier used for post-expiration degradation.
+ */
+export const multiple_value = 2;
+
+
 /**
  * Enum defining the behavior for each drug type.
- * Includes information such as increase/decrease amounts and degradation multipliers.
+ * Includes information such as increase/decrease Benefits and degradation multipliers.
  */
 export const DRUGS_BEHAVIOR = {
     [DRUGS_NAMES.HERBAL_TEA]: {
-        decreaseAmount: 0,
-        increaseAmountBeforeExpiration: 1,
-        increaseAmountAfterExpiration: 2,
+        increaseBenefitBeforeExpiration: 1,
+        increaseBenefitAfterExpiration: [DRUGS_NAMES.HERBAL_TEA].increaseBenefitBeforeExpiration * multiple_value,
     },
     [DRUGS_NAMES.FERVEX]: {
-        decreaseAmount: 0,
-        increaseAmounts: {
+        increaseBenefits: {
             default: 1,
             lessThan10Days: 2,
             lessThan5Days: 3,
             afterExpiry: 0,
         },
     },
-    [DRUGS_NAMES.MAGIC_PILL]: {decreaseAmount: 0, increaseAmount: 0},
+    [DRUGS_NAMES.MAGIC_PILL]: {decreaseBenefit: 0, increaseBenefit: 0},
     [DRUGS_NAMES.DAFALGAN]: {
-        decreaseAmount: 2,
-        increaseAmount: 0,
+        decreaseBenefit: DEFAULT_DRUGS_BEHAVIOR.decreaseBenefit * multiple_value,
     },
+
 };
 
-/**
- * Default behavior for drugs not explicitly defined in `DRUGS_BEHAVIOR`.
- */
-export const DEFAULT_DRUGS_BEHAVIOR = {decreaseAmount: 1, increaseAmount: 0};
-
-/**
- * Multiplier used for post-expiration degradation.
- */
-export const multiple_value = 2;
 
 /**
  * Represents a drug with a name, expiration date, and benefit value.
@@ -70,12 +73,13 @@ export class Pharmacy {
     updateBenefitValue() {
         this.drugs.forEach((drug) => {
             const behavior = DRUGS_BEHAVIOR[drug.name] || DEFAULT_DRUGS_BEHAVIOR;
-            if (drug.expiresIn > 0) {
+            if (drug.expiresIn >= 0) {
                 this.handleNotExpired(drug, behavior);
-                this.decreaseExpiresIn(drug);
             } else {
                 this.handleExpired(drug, behavior);
             }
+            this.decreaseExpiresIn(drug);
+
         });
 
         return this.drugs;
@@ -95,9 +99,9 @@ export class Pharmacy {
      */
     updateHerbalTea(drug, behavior) {
         if (drug.expiresIn < 0) {
-            this.increaseBenefit(drug, behavior.increaseAmountAfterExpiration);
+            this.increaseBenefit(drug, behavior.increaseBenefitAfterExpiration);
         } else {
-            this.increaseBenefit(drug, behavior.increaseAmountBeforeExpiration);
+            this.increaseBenefit(drug, behavior.increaseBenefitBeforeExpiration);
         }
     }
 
@@ -107,13 +111,13 @@ export class Pharmacy {
      */
     updateFervex(drug, behavior) {
         if (drug.expiresIn <= 0) {
-            drug.benefit = behavior.increaseAmounts.afterExpiry;
+            drug.benefit = behavior.increaseBenefits.afterExpiry;
         } else if (drug.expiresIn <= 5) {
-            this.increaseBenefit(drug, behavior.increaseAmounts.lessThan5Days);
+            this.increaseBenefit(drug, behavior.increaseBenefits.lessThan5Days);
         } else if (drug.expiresIn <= 10) {
-            this.increaseBenefit(drug, behavior.increaseAmounts.lessThan10Days);
+            this.increaseBenefit(drug, behavior.increaseBenefits.lessThan10Days);
         } else {
-            this.increaseBenefit(drug, behavior.increaseAmounts.default);
+            this.increaseBenefit(drug, behavior.increaseBenefits.default);
         }
     }
 
@@ -121,14 +125,17 @@ export class Pharmacy {
      * Handles the behavior of Dafalgan, decreasing its benefit faster than normal drugs.
      */
     updateDafalgan(drug, behavior) {
-        this.decreaseBenefit(drug, behavior.decreaseAmount);
+        if (drug.expiresIn < 0) {
+            this.decreaseBenefit(drug, behavior.decreaseBenefit * multiple_value);
+        }
+        this.decreaseBenefit(drug, behavior.decreaseBenefit);
     }
 
     /**
      * Handles the behavior of normal drugs, decreasing their benefit.
      */
     updateNormalDrug(drug, behavior) {
-        this.decreaseBenefit(drug, behavior.decreaseAmount);
+        this.decreaseBenefit(drug, behavior.decreaseBenefit);
     }
 
     /**
@@ -161,38 +168,38 @@ export class Pharmacy {
     handleExpired(drug, behavior) {
         switch (drug.name) {
             case DRUGS_NAMES.HERBAL_TEA:
-                this.increaseBenefit(drug, behavior.increaseAmount);
+                this.increaseBenefit(drug, behavior.increaseBenefit);
                 break;
             case DRUGS_NAMES.FERVEX:
-                drug.benefit = behavior.increaseAmounts.afterExpiry;
+                drug.benefit = behavior.increaseBenefits.afterExpiry;
                 break;
             case DRUGS_NAMES.DAFALGAN:
-                this.decreaseBenefit(drug, behavior.decreaseAmount * multiple_value);
+                this.decreaseBenefit(drug, behavior.decreaseBenefit * multiple_value);
                 break;
             default:
-                this.decreaseBenefit(drug, behavior.decreaseAmount * multiple_value);
+                this.decreaseBenefit(drug, behavior.decreaseBenefit * multiple_value);
         }
     }
 
     /**
      * Increases the benefit of a drug up to a maximum value.
      */
-    increaseBenefit(drug, amount, maxBenefit = 50) {
-        if (drug.benefit + amount > maxBenefit) {
+    increaseBenefit(drug, Benefit, maxBenefit = 50) {
+        if (drug.benefit + Benefit > maxBenefit) {
             drug.benefit = maxBenefit;
         } else {
-            drug.benefit += amount;
+            drug.benefit += Benefit;
         }
     }
 
     /**
      * Decreases the benefit of a drug down to a minimum value.
      */
-    decreaseBenefit(drug, amount, minBenefit = 0) {
-        if (drug.benefit - amount < minBenefit) {
+    decreaseBenefit(drug, Benefit, minBenefit = 0) {
+        if (drug.benefit - Benefit < minBenefit) {
             drug.benefit = minBenefit;
         } else {
-            drug.benefit -= amount;
+            drug.benefit -= Benefit;
         }
     }
 }
