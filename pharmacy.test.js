@@ -13,7 +13,6 @@ describe("Pharmacy", () => {
         const drugs = [new Drug(DRUGS_NAMES.DAFALGAN, 0, 10)];
         const pharmacy = new Pharmacy(drugs);
         const updatedDrugs = pharmacy.updateBenefitValue();
-        console.log(updatedDrugs);
         expect(updatedDrugs).toEqual(
             [new Drug(DRUGS_NAMES.DAFALGAN, -1, 6)]
         ); // Correct the expiresIn value
@@ -44,6 +43,16 @@ describe("Pharmacy", () => {
         const updatedDrugs = pharmacy.updateBenefitValue();
         expect(updatedDrugs).toEqual(
             [new Drug(DRUGS_NAMES.DAFALGAN, 2, 8)]
+        ); // expiresIn decreases by 1, benefit decreases by 2
+    });
+
+
+    it("should decrease the expiresIn for Herbal Tea and te benefits should not pass 50", () => {
+        const drugs = [new Drug(DRUGS_NAMES.HERBAL_TEA, 3, 49)];
+        const pharmacy = new Pharmacy(drugs);
+        const updatedDrugs = pharmacy.updateBenefitValue();
+        expect(updatedDrugs).toEqual(
+            [new Drug(DRUGS_NAMES.HERBAL_TEA, 2, 50)]
         ); // expiresIn decreases by 1, benefit decreases by 2
     });
 
