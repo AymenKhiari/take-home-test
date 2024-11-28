@@ -15,7 +15,7 @@ describe("Pharmacy", () => {
         const updatedDrugs = pharmacy.updateBenefitValue();
         expect(updatedDrugs).toEqual(
             [new Drug(DRUGS_NAMES.DAFALGAN, -1, 6)]
-        ); // Correct the expiresIn value
+        );
     })
 
     it("should decrease the benefit of Dafalgan twice as fast before expiration", () => {
@@ -23,7 +23,7 @@ describe("Pharmacy", () => {
         const pharmacy = new Pharmacy(drugs);
         const updatedDrugs = pharmacy.updateBenefitValue();
         expect(updatedDrugs).toEqual(
-            [new Drug(DRUGS_NAMES.DAFALGAN, 2, 8)] // Benefit decreases by 2, expiresIn decreases by 1
+            [new Drug(DRUGS_NAMES.DAFALGAN, 2, 8)]
         );
     });
 
@@ -34,7 +34,7 @@ describe("Pharmacy", () => {
         const updatedDrugs = pharmacy.updateBenefitValue();
         expect(updatedDrugs).toEqual(
             [new Drug(DRUGS_NAMES.DAFALGAN, 4, 0)]
-        ); // Ensure benefit does not go below 0
+        );
     });
 
     it("should decrease the expiresIn for Dafalgan", () => {
@@ -43,7 +43,7 @@ describe("Pharmacy", () => {
         const updatedDrugs = pharmacy.updateBenefitValue();
         expect(updatedDrugs).toEqual(
             [new Drug(DRUGS_NAMES.DAFALGAN, 2, 8)]
-        ); // expiresIn decreases by 1, benefit decreases by 2
+        );
     });
 
 
@@ -53,7 +53,7 @@ describe("Pharmacy", () => {
         const updatedDrugs = pharmacy.updateBenefitValue();
         expect(updatedDrugs).toEqual(
             [new Drug(DRUGS_NAMES.HERBAL_TEA, 2, 50)]
-        ); // expiresIn decreases by 1, benefit decreases by 2
+        );
     });
 
 
@@ -63,9 +63,8 @@ describe("Pharmacy", () => {
         const updatedDrugs = pharmacy.updateBenefitValue();
         expect(updatedDrugs).toEqual(
             [new Drug(DRUGS_NAMES.MAGIC_PILL, 3, 49)]
-        ); // expiresIn decreases by 1, benefit decreases by 2
+        );
     });
-
 
 });
 
