@@ -112,9 +112,9 @@ export class Pharmacy {
     updateFervex(drug, behavior) {
         if (drug.expiresIn <= 0) {
             drug.benefit = behavior.increaseBenefits.afterExpiry;
-        } else if (drug.expiresIn <= 5) {
+        } else if (drug.expiresIn <= 5 && drug.expiresIn > 0) {
             this.increaseBenefit(drug, behavior.increaseBenefits.lessThan5Days);
-        } else if (drug.expiresIn <= 10) {
+        } else if (drug.expiresIn <= 10 && drug.expiresIn > 5) {
             this.increaseBenefit(drug, behavior.increaseBenefits.lessThan10Days);
         } else {
             this.increaseBenefit(drug, behavior.increaseBenefits.default);
