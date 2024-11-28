@@ -57,5 +57,15 @@ describe("Pharmacy", () => {
     });
 
 
+    it("should not change anything in the expiration of Magic Bill and in its benefits ", () => {
+        const drugs = [new Drug(DRUGS_NAMES.MAGIC_PILL, 3, 49)];
+        const pharmacy = new Pharmacy(drugs);
+        const updatedDrugs = pharmacy.updateBenefitValue();
+        expect(updatedDrugs).toEqual(
+            [new Drug(DRUGS_NAMES.MAGIC_PILL, 3, 49)]
+        ); // expiresIn decreases by 1, benefit decreases by 2
+    });
+
+
 });
 
