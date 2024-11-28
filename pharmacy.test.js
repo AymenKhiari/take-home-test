@@ -13,19 +13,21 @@ describe("Pharmacy", () => {
         const drugs = [new Drug(DRUGS_NAMES.DAFALGAN, 0, 10)];
         const pharmacy = new Pharmacy(drugs);
         const updatedDrugs = pharmacy.updateBenefitValue();
+        console.log(updatedDrugs);
         expect(updatedDrugs).toEqual(
-            [new Drug(DRUGS_NAMES.DAFALGAN, 0, 6)]
+            [new Drug(DRUGS_NAMES.DAFALGAN, -1, 6)]
         ); // Correct the expiresIn value
     })
 
-    it("should decrease the benefit of Dafalgan four times as fast after expiration", () => {
-        const drugs = [new Drug(DRUGS_NAMES.DAFALGAN, 0, 10)];
+    it("should decrease the benefit of Dafalgan twice as fast before expiration", () => {
+        const drugs = [new Drug(DRUGS_NAMES.DAFALGAN, 3, 10)];
         const pharmacy = new Pharmacy(drugs);
         const updatedDrugs = pharmacy.updateBenefitValue();
         expect(updatedDrugs).toEqual(
-            [new Drug(DRUGS_NAMES.DAFALGAN, 0, 6)]
-        ); // Decrease benefit by 4, expiresIn decreases by 1
+            [new Drug(DRUGS_NAMES.DAFALGAN, 2, 8)] // Benefit decreases by 2, expiresIn decreases by 1
+        );
     });
+
 
     it("should not decrease the benefit of Dafalgan below 0", () => {
         const drugs = [new Drug(DRUGS_NAMES.DAFALGAN, 5, 1)];

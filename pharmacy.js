@@ -73,7 +73,7 @@ export class Pharmacy {
     updateBenefitValue() {
         this.drugs.forEach((drug) => {
             const behavior = DRUGS_BEHAVIOR[drug.name] || DEFAULT_DRUGS_BEHAVIOR;
-            if (drug.expiresIn >= 0) {
+            if (drug.expiresIn > 0) {
                 this.handleNotExpired(drug, behavior);
             } else {
                 this.handleExpired(drug, behavior);
@@ -127,8 +127,9 @@ export class Pharmacy {
     updateDafalgan(drug, behavior) {
         if (drug.expiresIn < 0) {
             this.decreaseBenefit(drug, behavior.decreaseBenefit * multiple_value);
+        } else {
+            this.decreaseBenefit(drug, behavior.decreaseBenefit);
         }
-        this.decreaseBenefit(drug, behavior.decreaseBenefit);
     }
 
     /**
